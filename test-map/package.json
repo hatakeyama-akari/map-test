@@ -6,6 +6,7 @@
   "author": "",
   "dependencies": {
     "@material-ui/core": "^4.11.3",
+    "axios": "^0.21.1",
     "gatsby": "^3.0.1",
     "gatsby-plugin-material-ui": "^2.1.10",
     "mapbox-gl": "^2.2.0",

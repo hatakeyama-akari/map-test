@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import {
   Paper,
@@ -21,19 +21,36 @@ const useStyles = makeStyles({
   },
 })
 
-const Sidebar = () => {
+const Sidebar = ({ isochroneCallback }) => {
   const classes = useStyles()
 
-  const [mode, setMode] = React.useState("walking")
+  const [mode, setMode] = useState("walking")
+  const [duration, setDuration] = useState("10")
+  const [callbackParams, setCallbackParams] = useState({
+    mode: "walking",
+    duration: "10",
+  })
 
-  const handleChangeMode = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMode((event.target as HTMLInputElement).value)
+  useEffect(() => {
+    isochroneCallback(callbackParams)
+  }, [])
+
+  function handleChangeMode(event: React.ChangeEvent<HTMLInputElement>) {
+    const modeValue = (event.target as HTMLInputElement).value
+    setMode(modeValue)
+    isochroneCallback({
+      mode: modeValue,
+      duration,
+    })
   }
 
-  const [duration, setDuration] = React.useState("10")
-
-  const handleChangeDuration = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDuration((event.target as HTMLInputElement).value)
+  function handleChangeDuration(event: React.ChangeEvent<HTMLInputElement>) {
+    const durationValue = (event.target as HTMLInputElement).value
+    setDuration(durationValue)
+    isochroneCallback({
+      mode,
+      duration: durationValue,
+    })
   }
 
   return (
