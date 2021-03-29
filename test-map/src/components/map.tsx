@@ -6,8 +6,10 @@ const MAPBOX_TOKEN =
   "pk.eyJ1IjoiaGF0YWtleWFtYTAiLCJhIjoiY2tseWdtNzl5MDM2ZzJxcGZtaXliaXR6YiJ9.9TxbJAWYCVPnZEZ5kSy-sw"
 
 const mapContainerStyle = {
+  position: "absolute",
+  top: 0,
+  bottom: 0,
   width: "100%",
-  height: "480px",
 }
 
 const Map = () => {
@@ -20,9 +22,8 @@ const Map = () => {
       container: mapContainerRef.current,
       accessToken: MAPBOX_TOKEN,
       style: "mapbox://styles/mapbox/streets-v11",
-      // Empire State Building [lng, lat]
-      center: [-73.9856, 40.7497],
-      zoom: 10,
+      center: [139.71600802692055, 35.6683063172107],
+      zoom: 13,
     })
     map.addControl(new mapboxgl.NavigationControl(), "top-right")
 

@@ -1,15 +1,10 @@
 import * as React from "react"
 import { PageProps, graphql } from "gatsby"
-import { makeStyles } from "@material-ui/core/styles"
-import { Typography, Container, Button, Link } from "@material-ui/core"
 
 import Map from "../components/map"
+import Sidebar from "../components/sidebar"
 
 import Layout from "../components/layout"
-
-const useStyles = makeStyles({
-  container: {},
-})
 
 type DataProps = {
   site: {
@@ -18,10 +13,10 @@ type DataProps = {
 }
 
 const IndexPage: React.FC<PageProps<DataProps>> = ({ data, path }) => {
-  const classes = useStyles()
   return (
     <Layout>
       <Map />
+      <Sidebar />
     </Layout>
   )
 }
