@@ -49,19 +49,36 @@ const Map = () => {
     duration: "10",
   }
 
+  const INITIAL_LON = 139.71595002
+  const INITIAL_LAT = 35.66809232
+
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       accessToken: MAPBOX_ACCESS_TOKEN,
       style: "mapbox://styles/mapbox/streets-v11",
-      center: [139.71600802692055, 35.6683063172107],
+      center: [INITIAL_LON, INITIAL_LAT],
       zoom: 13,
     })
     map.addControl(new mapboxgl.NavigationControl(), "top-right")
 
     setMap(map)
 
+    const marker = new mapboxgl.Marker({
+      color: "#314ccd",
+    })
+
+    // Create a LngLat object to use in the marker initialization
+    // https://docs.mapbox.com/mapbox-gl-js/api/#lnglat
+    const lngLat = {
+      lon: INITIAL_LON,
+      lat: INITIAL_LAT,
+    }
+
     map.on("load", () => {
+      // Initialize the marker at the query coordinates
+      marker.setLngLat(lngLat).addTo(map)
+
       // When the map loads, add the source and layer
       map.addSource("iso", {
         type: "geojson",
