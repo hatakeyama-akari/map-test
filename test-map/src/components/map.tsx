@@ -14,7 +14,7 @@ const mapContainerStyle = {
   width: "100%",
 }
 
-async function getIsochrone(mode: string, minutes: string) {
+async function getIsochrone(map, mode: string, minutes: string) {
   const urlBase = "https://api.mapbox.com/isochrone/v1/mapbox/"
   const lon = 139.71600802692055
   const lat = 35.6683063172107
@@ -31,25 +31,23 @@ async function getIsochrone(mode: string, minutes: string) {
     "&polygons=true&access_token=" +
     MAPBOX_ACCESS_TOKEN
 
-  console.log(query)
-
   try {
     const response = await axios.get(query)
-    console.log(response)
+    // Set the 'iso' source's data to what's returned by the API query
+    map.getSource("iso").setData(response.data)
   } catch (error) {
     console.error(error)
   }
 }
 
-function isochroneCallback(params) {
-  console.log(params)
-  getIsochrone(params.mode, params.duration)
-}
-
 const Map = () => {
   const mapContainerRef = useRef(null)
-
   const [map, setMap] = useState(null)
+
+  const INITIAL_PARAMS = {
+    mode: "walking",
+    duration: "10",
+  }
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -63,8 +61,42 @@ const Map = () => {
 
     setMap(map)
 
-    return () => map.remove()
+    map.on("load", () => {
+      // When the map loads, add the source and layer
+      map.addSource("iso", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
+      })
+
+      map.addLayer(
+        {
+          id: "isoLayer",
+          type: "fill",
+          // Use "iso" as the data source for this layer
+          source: "iso",
+          layout: {},
+          paint: {
+            // The fill color for the layer is set to a light purple
+            "fill-color": "#5a3fc0",
+            "fill-opacity": 0.3,
+          },
+        },
+        "poi-label"
+      )
+
+      // Make the API call
+      getIsochrone(map, INITIAL_PARAMS.mode, INITIAL_PARAMS.duration)
+    })
   }, [])
+
+  function isochroneCallback(params) {
+    if (map) {
+      getIsochrone(map, params.mode, params.duration)
+    }
+  }
 
   return (
     <>
