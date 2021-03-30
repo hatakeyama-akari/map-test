@@ -21,7 +21,7 @@ const useStyles = makeStyles({
   },
 })
 
-const Sidebar = ({ isochroneCallback }) => {
+const Sidebar = ({ isochroneCallback }: { isochroneCallback: any }) => {
   const classes = useStyles()
 
   const [mode, setMode] = useState("walking")

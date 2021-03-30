@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react"
 import axios from "axios"
+import { makeStyles } from "@material-ui/core/styles"
 import mapboxgl from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 
@@ -14,16 +15,20 @@ const INITIAL_LAT = 35.66809232
 const INITIAL_MODE = "walking"
 const INITIAL_DURATION = "10"
 
-const mapContainerStyle = {
-  position: "absolute",
-  top: 0,
-  bottom: 0,
-  width: "100%",
-}
+const useStyles = makeStyles({
+  mapContainer: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: "100%",
+  },
+})
 
-const Map = () => {
-  const mapContainerRef = useRef(null)
-  const [map, setMap] = useState(null)
+const Map: React.FC = () => {
+  const classes = useStyles()
+
+  const mapContainerRef = useRef<HTMLDivElement | null>(null)
+  const [map, setMap] = useState<mapboxgl.Map>()
   const [lonLat, setLonLat] = useState({
     lon: INITIAL_LON,
     lat: INITIAL_LAT,
@@ -49,6 +54,9 @@ const Map = () => {
   }
 
   useEffect(() => {
+    if (!mapContainerRef.current) {
+      return
+    }
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       accessToken: MAPBOX_ACCESS_TOKEN,
@@ -98,12 +106,16 @@ const Map = () => {
     map && getIsochrone(map, isoParams.mode, isoParams.duration)
   }, [lonLat])
 
-  function isochroneCallback(params) {
+  function isochroneCallback(params: { mode: string; duration: string }) {
     setIsoParams(params)
     map && getIsochrone(map, params.mode, params.duration)
   }
 
-  async function getIsochrone(map, mode: string, duration: string) {
+  async function getIsochrone(
+    map: mapboxgl.Map,
+    mode: string,
+    duration: string
+  ) {
     const urlBase = "https://api.mapbox.com/isochrone/v1/mapbox/"
 
     const query =
@@ -121,7 +133,10 @@ const Map = () => {
     try {
       const response = await axios.get(query)
       // Set the 'iso' source's data to what's returned by the API query
-      map.getSource("iso").setData(response.data)
+      const source: mapboxgl.GeoJSONSource = map.getSource(
+        "iso"
+      ) as mapboxgl.GeoJSONSource
+      source.setData(response.data)
     } catch (error) {
       console.error(error)
     }
@@ -129,7 +144,7 @@ const Map = () => {
 
   return (
     <>
-      <div ref={mapContainerRef} style={mapContainerStyle} />
+      <div ref={mapContainerRef} className={classes.mapContainer} />
       <Sidebar isochroneCallback={isochroneCallback} />
       <LonLatBox lon={lonLat.lon} lat={lonLat.lat} />
     </>
