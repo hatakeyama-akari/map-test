@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from "react"
 import axios from "axios"
 import { makeStyles } from "@material-ui/core/styles"
-import mapboxgl from "mapbox-gl"
+import mapboxgl from "mapbox-gl/dist/mapbox-gl"
+import MapboxWorker from "mapbox-gl/dist/mapbox-gl-csp-worker"
 import "mapbox-gl/dist/mapbox-gl.css"
 
 import Sidebar from "../components/sidebar"
@@ -24,11 +25,14 @@ const useStyles = makeStyles({
   },
 })
 
+// Wire up loaded worker to be used instead of the default
+mapboxgl.workerClass = MapboxWorker
+
 const Map: React.FC = () => {
   const classes = useStyles()
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
-  const [map, setMap] = useState<mapboxgl.Map>()
+  const [map, setMap] = useState()
   const [lonLat, setLonLat] = useState({
     lon: INITIAL_LON,
     lat: INITIAL_LAT,
@@ -111,11 +115,7 @@ const Map: React.FC = () => {
     map && getIsochrone(map, params.mode, params.duration)
   }
 
-  async function getIsochrone(
-    map: mapboxgl.Map,
-    mode: string,
-    duration: string
-  ) {
+  async function getIsochrone(map: any, mode: string, duration: string) {
     const urlBase = "https://api.mapbox.com/isochrone/v1/mapbox/"
 
     const query =
@@ -133,10 +133,7 @@ const Map: React.FC = () => {
     try {
       const response = await axios.get(query)
       // Set the 'iso' source's data to what's returned by the API query
-      const source: mapboxgl.GeoJSONSource = map.getSource(
-        "iso"
-      ) as mapboxgl.GeoJSONSource
-      source.setData(response.data)
+      map.getSource("iso").setData(response.data)
     } catch (error) {
       console.error(error)
     }
