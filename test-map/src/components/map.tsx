@@ -32,7 +32,8 @@ const Map: React.FC = () => {
   const classes = useStyles()
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
-  const [map, setMap] = useState()
+  const [map, setMap] = useState(null)
+  const [marker, setMarker] = useState<any | null>(null)
   const [lonLat, setLonLat] = useState({
     lon: INITIAL_LON,
     lat: INITIAL_LAT,
@@ -41,21 +42,6 @@ const Map: React.FC = () => {
     mode: INITIAL_MODE,
     duration: INITIAL_DURATION,
   })
-
-  const marker = new mapboxgl.Marker({
-    color: "#314ccd",
-    draggable: true,
-  })
-
-  marker.on("dragend", onDragEnd)
-
-  function onDragEnd() {
-    const lngLat = marker.getLngLat()
-    setLonLat({
-      lon: lngLat.lng,
-      lat: lngLat.lat,
-    })
-  }
 
   useEffect(() => {
     if (!mapContainerRef.current) {
@@ -69,8 +55,13 @@ const Map: React.FC = () => {
       zoom: 13,
     })
     map.addControl(new mapboxgl.NavigationControl(), "top-right")
-
     setMap(map)
+
+    const marker = new mapboxgl.Marker({
+      color: "#314ccd",
+      draggable: true,
+    })
+    setMarker(marker)
 
     map.on("load", () => {
       // Initialize the marker at the query coordinates
@@ -109,6 +100,16 @@ const Map: React.FC = () => {
   useEffect(() => {
     map && getIsochrone(map, isoParams.mode, isoParams.duration)
   }, [lonLat])
+
+  marker && marker.on("dragend", onDragEnd)
+
+  function onDragEnd() {
+    const lngLat = marker.getLngLat()
+    setLonLat({
+      lon: lngLat.lng,
+      lat: lngLat.lat,
+    })
+  }
 
   function isochroneCallback(params: { mode: string; duration: string }) {
     setIsoParams(params)
