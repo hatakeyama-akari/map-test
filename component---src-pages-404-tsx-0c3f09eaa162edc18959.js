@@ -1,0 +1,2 @@
+(self.webpackChunktest_map=self.webpackChunktest_map||[]).push([[218],{938:function(e,t,n){"use strict";n.r(t);var u=n(7294),l=n(2182);t.default=function(){return u.createElement(l.Z,null,u.createElement("h1",null,"You are here!"),u.createElement("h2",null,"But nothing found for you #404"))}}}]);
+//# sourceMappingURL=component---src-pages-404-tsx-0c3f09eaa162edc18959.js.map
